@@ -1,0 +1,55 @@
+{
+  "name": "haproxy-api",
+  "version": "1.0.0",
+  "description": "Promise-based Javascript API server for HAProxy management",
+  "main": "app.js",
+  "license": "(MIT OR Apache-2.0)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jackpinetech/haproxy-api.git"
+  },
+  "author": "Shaun Tarves <shaun.tarves@jackpinetech.com>",
+  "scripts": {
+    "start": "node app.js",
+    "test": "nyc mocha --timeout=10000 --exit"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chalk": "^2.4.1",
+    "compression": "^1.7.4",
+    "dotenv": "^8.0.0",
+    "errorhandler": "^1.5.1",
+    "express": "^4.16.3",
+    "fs-extra": "^7.0.1",
+    "haproxy": "^0.3.0",
+    "haproxy-sdk": "^1.0.0",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-headerapikey": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-chai-friendly": "^0.4.1",
+    "eslint-plugin-import": "^2.16.0",
+    "mocha": "^6.1.1",
+    "nyc": "^13.3.0",
+    "prettier": "^1.17.1"
+  },
+  "keywords": [
+    "HAProxy",
+    "proxy",
+    "load balancer",
+    "orchestration",
+    "cloud",
+    "reverse",
+    "load",
+    "balancer"
+  ],
+  "engines": {
+    "node": ">=8.11.3",
+    "npm": ">=5.6.0"
+  }
+}
