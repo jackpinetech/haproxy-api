@@ -1,80 +1,885 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
 
 # haproxy-api
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+*haproxy-api* provides a Javascript-native ReSTful interface to the "stats" socket of HAProxy.
 
-## Questions Collection [/questions]
+It uses the [haproxy-sdk](https://github.com/jackpinetech/haproxy-sdk) Javascript library to interact with HAProxy and run all commands.
 
-### List All Questions [GET]
+## Features
+
+* HAProxy in multi-process mode (`nbproc` >1)
+* UNIX stats socket, no support for querying HTTP statistics page
+* Frontend operations
+* Backend operations
+* Server operations
+* ACL operations
+* MAP operations
+* stick-table operations
+* Aggregation on various statistics
+* Change global options for HAProxy
+
+# Group HAProxy
+
+Resources related to global HAProxy operations.
+
+## Statistic counters [/haproxy/all]
+
+### Clear all statistics counters [DELETE]
+
+Clears all statistics counters in each proxy (frontend & backend) and in each server.
+
+This has the same effect as restarting. This command is restricted and can only be issued on sockets configured for level "admin".
+
++ Response 204
+
+## Statistic counters [/haproxy/counters]
+
+### Clear maximum value of statistics counters [DELETE]
+
+Clears the maximum values of the statistics counters in each proxy (frontend & backend) and in each server.
+
+This can be used to get clean counters after an incident, without having to restart nor to clear traffic counters. This command is restricted and can only be issued on sockets configured for levels "operator" or "admin".
+
++ Response 204
+
+## Description [/haproxy/description]
+
+### Show description [GET]
+
+Return description of HAProxy.
+
++ Response 200 (application/json)
+
+        ""
+
+## Release date [/haproxy/errors]
+
+### Show errors [GET]
+
+Return last know request and response errors. Returns a list of tuples of errors per process.
+
++ Response 200 (application/json)
+
+        [
+          {
+            '1': [
+              "No such proxy."
+            ]
+          }
+        ]
+
+## Info [/haproxy/info]
+
+### Show Info [GET]
+
+Dump info about HAProxy stats.
 
 + Response 200 (application/json)
 
         [
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
+                "Name": "HAProxy",
+                "Version": "1.9.8",
+                "Release_date": "2019/05/13",
+                "Nbthread": "1",
+                "Nbproc": "1",
+                "Process_num": "1",
+                "Pid": "11",
+                "Uptime": "0d 5h01m33s",
+                "Uptime_sec": "18093",
+                "Memmax_MB": "0",
+                "PoolAlloc_MB": "0",
+                "PoolUsed_MB": "0",
+                "PoolFailed": "0",
+                "Ulimit-n": "4045",
+                "Maxsock": "4045",
+                "Maxconn": "2000",
+                "Hard_maxconn": "2000",
+                "CurrConns": "0",
+                "CumConns": "181",
+                "CumReq": "181",
+                "MaxSslConns": "0",
+                "CurrSslConns": "0",
+                "CumSslConns": "0",
+                "Maxpipes": "0",
+                "PipesUsed": "0",
+                "PipesFree": "0",
+                "ConnRate": "0",
+                "ConnRateLimit": "0",
+                "MaxConnRate": "0",
+                "SessRate": "0",
+                "SessRateLimit": "0",
+                "MaxSessRate": "0",
+                "SslRate": "0",
+                "SslRateLimit": "0",
+                "MaxSslRate": "0",
+                "SslFrontendKeyRate": "0",
+                "SslFrontendMaxKeyRate": "0",
+                "SslFrontendSessionReuse_pct": "0",
+                "SslBackendKeyRate": "0",
+                "SslBackendMaxKeyRate": "0",
+                "SslCacheLookups": "0",
+                "SslCacheMisses": "0",
+                "CompressBpsIn": "0",
+                "CompressBpsOut": "0",
+                "CompressBpsRateLim": "0",
+                "ZlibMemUsage": "0",
+                "MaxZlibMemUsage": "0",
+                "Tasks": "9",
+                "Run_queue": "2",
+                "Idle_pct": "100",
+                "node": "9deb92de7244",
+                "Stopping": "0",
+                "Jobs": "5",
+                "Unstoppable Jobs": "0",
+                "Listeners": "4",
+                "ActivePeers": "0",
+                "ConnectedPeers": "0",
+                "DroppedLogs": "0",
+                "BusyPolling": "0"
             }
         ]
 
-### Create a New Question [POST]
+## Maximum Connections [/haproxy/maxconn]
 
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+### Show maximum connections [GET]
+
+Return the sum of configured maximum connections allowed for HAProxy.
+
++ Response 200 (application/json)
+
+        2000
+
+### Update maximum connections [PATCH]
+
+Update the global maximum connection limit
 
 + Request (application/json)
 
         {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
+            "maxconn": 8000
         }
 
-+ Response 201 (application/json)
++ Response 204
 
-    + Headers
+## Available metrics [/haproxy/metrics]
 
-            Location: /questions/2
+### Show available metrics [GET]
 
-    + Body
+Return the available set of metrics for the global HAProxy instance.
 
++ Response 200 (application/json)
+
+        [
+          "SslFrontendMaxKeyRate",
+          "Hard_maxconn",
+          "SessRateLimit",
+          "Process_num",
+          "Memmax_MB",
+          "CompressBpsRateLim",
+          "MaxSslConns",
+          "ConnRateLimit",
+          "SslRateLimit",
+          "MaxConnRate",
+          "CumConns",
+          "SslBackendKeyRate",
+          "SslCacheLookups",
+          "CurrSslConns",
+          "Run_queue",
+          "Maxpipes",
+          "Idle_pct",
+          "SslFrontendKeyRate",
+          "Tasks",
+          "MaxZlibMemUsage",
+          "SslFrontendSessionReuse_pct",
+          "CurrConns",
+          "SslCacheMisses",
+          "SslRate",
+          "CumSslConns",
+          "PipesUsed",
+          "Maxconn",
+          "CompressBpsIn",
+          "ConnRate",
+          "Ulimit-n",
+          "SessRate",
+          "SslBackendMaxKeyRate",
+          "CumReq",
+          "PipesFree",
+          "ZlibMemUsage",
+          "Uptime_sec",
+          "CompressBpsOut",
+          "Maxsock",
+          "MaxSslRate",
+          "MaxSessRate"
+        ]
+
+## Metric [/haproxy/metric/{name}]
+
++ Parameters
+  + name (string) - metric name to retrieve
+
+### Show metric value [GET]
+
+Return the value of a metric. Performs a calculation on the metric across all HAProxy processes.
+
++ Response 200 (application/json)
+
+        0
+
+## Release date [/haproxy/node]
+
+### Show node name [GET]
+
+Return nodename of HAProxy.
+
++ Response 200 (application/json)
+
+        "9deb92de7244"
+
+## Process IDs [/haproxy/pids]
+
+### Show process IDs [GET]
+
+Return the process IDs of all HAProxy processes.
+
++ Response 200 (application/json)
+
+        [
+          "11",
+          "13"
+        ]
+
+## Rate limits [/haproxy/rate-limits]
+
+### Show rate limits [GET]
+
+Return the process-wide rate limits.
+
++ Response 200 (application/json)
+
+        {
+          "connections": 0,
+          "sessions": 0,
+          "sslSessions": 0
+        }
+
+### Update rate limits [PATCH]
+
+Update the process-wide connection rate limits.
+
++ Request (application/json)
+
+        {
+          "connections": 8000,
+          "sessions": 1000,
+          "sslSessions": 500
+        }
+
++ Response 204
+
+## Release date [/haproxy/release-date]
+
+### Show Release date [GET]
+
+Return release date of HAProxy.
+
++ Response 200 (application/json)
+
+        "2019/05/13"
+
+## Requests [/haproxy/requests]
+
+### Show total requests [GET]
+
+Return total requests processed by all frontends.
+
++ Response 200 (application/json)
+
+        1234
+
+## Uptime [/haproxy/uptime]
+
+### Show Uptime [GET]
+
+Return uptime of HAProxy process.
+
++ Response 200 (application/json)
+
+        "0d 5h06m44s"
+
+## Version [/haproxy/version]
+
+### Show Version [GET]
+
+Return version of HAProxy.
+
++ Response 200 (application/json)
+
+        "1.9.8"
+
+
+# Group Frontends
+
+Resources related to HAProxy frontend operations.
+
+## Frontend collection [/frontends]
+
+### List all frontends [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "_name": "tls"
+          },
+          {
+            "_name": "https"
+          }
+        ]
+
+## Frontend [/frontends/{name}]
+
++ Parameters
+  + name (string) - name of the frontend to lookup
+
+### Show frontend detail [GET]
+
++ Response 200 (application/json)
+
+        {
+          "iid": 3,
+          "name": "https",
+          "processNumber": [
+            1
+          ],
+          "requests": 0,
+          "status": "OPEN",
+          "maxconn": 2000,
+          "metrics": [
+            "bin",
+            "bout",
+            "comp_byp",
+            "comp_in",
+            "comp_out",
+            "comp_rsp",
+            "dreq",
+            "dresp",
+            "ereq",
+            "hrsp_1xx",
+            "hrsp_2xx",
+            "hrsp_3xx",
+            "hrsp_4xx",
+            "hrsp_5xx",
+            "hrsp_other",
+            "rate",
+            "rate_lim",
+            "rate_max",
+            "req_rate",
+            "req_rate_max",
+            "req_tot",
+            "scur",
+            "slim",
+            "smax",
+            "stot"
+          ]
+        }
+
+### Update frontend [PATCH]
+
+Update frontend.
+
++ Request (application/json)
+
+        {
+          "status": "up|down",
+          "maxconn": 2000
+        }
+
++ Response 204
+
+### Shutdown frontend [DELETE]
+
+Completely delete the specified frontend. All the ports it was bound to will
+be released. It will not be possible to enable the frontend anymore after
+this operation.
+
+This command is restricted and can only be issued on sockets configured for level "admin".
+
++ Response 204
+
+## Frontend metrics [/frontends/{name}/{metric}]
+
++ Parameters
+  + name (string) - name of the frontend to lookup
+  + metric (string) - metric name to retrieve
+
+### Show frontend metric [GET]
+
++ Response 200 (application/json)
+
+        34
+
+
+# Group Backends
+
+Resources related to HAProxy backend operations.
+
+## Backend collection [/backends]
+
+### List all backends [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "_name": "bk_https"
+          },
+          {
+            "_name": "bk_http"
+          }
+        ]
+
+## Backend [/backends/{name}]
+
++ Parameters
+  + name (string) - name of the backend to lookup
+
+### Show backend detail [GET]
+
++ Response 200 (application/json)
+
+        {
+          "iid": 4,
+          "name": "bk_https",
+          "processNumber": [],
+          "requests": 0,
+          "status": "UP",
+          "metrics": [
+            "act",
+            "bck",
+            "bin",
+            "bout",
+            "chkdown",
+            "cli_abrt",
+            "comp_byp",
+            "comp_in",
+            "comp_out",
+            "comp_rsp",
+            "ctime",
+            "downtime",
+            "dreq",
+            "dresp",
+            "econ",
+            "eresp",
+            "hrsp_1xx",
+            "hrsp_2xx",
+            "hrsp_3xx",
+            "hrsp_4xx",
+            "hrsp_5xx",
+            "hrsp_other",
+            "lastchg",
+            "lastsess",
+            "lbtot",
+            "qcur",
+            "qmax",
+            "qtime",
+            "rate",
+            "rate_max",
+            "rtime",
+            "scur",
+            "slim",
+            "smax",
+            "srv_abrt",
+            "stot",
+            "ttime",
+            "weight",
+            "wredis",
+            "wretr"
+          ]
+        }
+
+## Backend metrics [/backends/{name}/{metric}]
+
++ Parameters
+  + name (string) - name of the backend to lookup
+  + metric (string) - metric name to retrieve
+
+### Show backend metric [GET]
+
++ Response 200 (application/json)
+
+        0
+
+## Backend servers [/backends/{name}/servers]
+
++ Parameters
+  + name (string) - name of the backend to lookup
+
+### Show backend servers [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "sid": "1",
+            "name": "server1"
+          },
+          {
+            "sid": "2",
+            "name": "server2"
+          }
+        ]
+
+
+# Group Servers
+
+Resources related to HAProxy server operations.
+
+## Server collection [/servers]
+
+### List all servers [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "_backendname": "bk_https",
+            "_name": "server1"
+          },
+          {
+            "_backendname": "bk_https",
+            "_name": "server2"
+          },
+          {
+           "_backendname": "bk_http",
+           "_name": "server4"
+          }
+        ]
+
+## Server [/servers/{name}]
+
++ Parameters
+  + name (string) - name of the server to lookup
+
+### Show server detail [GET]
+
++ Response 200 (application/json)
+
+        {
+          "sid": "1",
+          "name": "server1",
+          "backends": [
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+              "processNumber": [
+                1
+              ],
+              "requests": 0,
+              "status": "no check",
+              "weight": "1",
+              "checkCode": "",
+              "checkStatus": ""
             }
+          ],
+          "address": "127.0.0.4",
+          "port": "0",
+          "metrics": [
+            "act",
+            "bck",
+            "bin",
+            "bout",
+            "check_duration",
+            "chkdown",
+            "chkfail",
+            "cli_abrt",
+            "ctime",
+            "downtime",
+            "dresp",
+            "econ",
+            "eresp",
+            "hrsp_1xx",
+            "hrsp_2xx",
+            "hrsp_3xx",
+            "hrsp_4xx",
+            "hrsp_5xx",
+            "hrsp_other",
+            "lastchg",
+            "lastsess",
+            "lbtot",
+            "qcur",
+            "qlimit",
+            "qmax",
+            "qtime",
+            "rate",
+            "rate_max",
+            "rtime",
+            "scur",
+            "slim",
+            "smax",
+            "srv_abrt",
+            "stot",
+            "throttle",
+            "ttime",
+            "weight",
+            "wredis",
+            "wretr"
+          ]
+        }
+
+### Update server [PATCH]
+
+Update server.
+
++ Request (application/json)
+
+        {
+          "address": "127.0.0.5",
+          "port": 443,
+          "status": "up|down|ready|offline|drain",
+          "weight": 128
+        }
+
++ Response 204
+
+### Shutdown server [DELETE]
+
+Immediately terminate all the sessions attached to the specified server. This
+can be used to terminate long-running sessions after a server is put into
+maintenance mode.
+
++ Response 204
+
+## Server metrics [/servers/{name}/{metric}]
+
++ Parameters
+  + name (string) - name of the servers to lookup
+  + metric (string) - metric name to retrieve
+
+### Show server metric [GET]
+
++ Response 200 (application/json)
+
+        [
+          {
+            "bk_https": 100,
+            "bk_http": 50
+          }
+        ]
+
+
+# Group Maps
+
+Resources related to HAProxy map operations.
+
+## Map collection [/maps]
+
+### List all maps [GET]
+
++ Response 200 (application/json)
+
+        [
+          "5 (/usr/local/etc/haproxy/map1.map) pattern loaded from file '/usr/local/etc/haproxy/map1.map' used by map at file '/usr/local/etc/haproxy/haproxy.cfg' line 50",
+          "6 (/usr/local/etc/haproxy/map2.map) pattern loaded from file '/usr/local/etc/haproxy/map2.map' used by map at file '/usr/local/etc/haproxy/haproxy.cfg' line 66"
+        ]
+
+## Map [/maps/{map_id}]
+
++ Parameters
+  + map_id (number) - ID of the map in the form of an integer
+
+### Show map detail [GET]
+
++ Response 200 (application/json)
+
+        [
+          "0x5650b3141d00 key1 value1",
+          "0x5650b3141d60 key2 value2"
+        ]
+
+### Update map [PATCH]
+
+Update map.
+
++ Request (application/json)
+
+        {
+          "key1": "new-value1",
+          "key2": "new-value2",
+          "key3": "value3"
+        }
+
++ Response 204
+
+### Clear map [DELETE]
+
+Clear all entries for a map.
+
++ Response 204
+
+## Map entries [/maps/{map_id}/{key}]
+
++ Parameters
+  + map_id (number) - ID of the map in the form of an integer
+  + key (string) - map key to lookup
+
+### Show map entries [GET]
+
++ Response 200 (application/json)
+
+        [
+          "type=dom, case=sensitive, found=yes, idx=list, key="key1", value="value1", type="str"",
+          "type=dom, case=sensitive, found=yes, idx=list, key="key1", value="value2", type="str""
+        ]
+
+### Delete map entries [DELETE]
+
+Delete the map entries corresponding to the key.
+
++ Response 204
+
+
+# Group ACLs
+
+Resources related to HAProxy ACL operations.
+
+## ACL collection [/acls]
+
+### List all ACLs [GET]
+
++ Response 200 (application/json)
+
+        [
+          "0 () acl 'path' file '/usr/local/etc/haproxy/haproxy.cfg' line 45",
+          "1 () acl 'req.hdr' file '/usr/local/etc/haproxy/haproxy.cfg' line 48",
+          "2 () acl 'ssl_fc' file '/usr/local/etc/haproxy/haproxy.cfg' line 64"
+        ]
+
+## ACL [/acls/{acl_id}]
+
++ Parameters
+  + acl_id (number) - ID of the ACL in the form of an integer
+
+### Show ACL detail [GET]
+
++ Response 200 (application/json)
+
+        [
+          "0x5650b31d4440 example.com",
+          "0x5650b31d4500 foo.com"
+        ]
+
+### Update ACL [PATCH]
+
+Update ACL.
+
++ Request (application/json)
+
+        {
+          "pattern": "bar.com"
+        }
+
++ Response 204
+
+### Clear ACL [DELETE]
+
+Clear all entries for an ACL.
+
++ Response 204
+
+## ACL entries [/acls/{acl_id}/{key}]
+
++ Parameters
+  + acl_id (number) - ID of the ACL in the form of an integer
+  + key (string) - key or ref of the ACL entry
+
+### Delete ACL entries [DELETE]
+
+Delete the ACL entries corresponding to the key/ref.
+
++ Response 204
+
+## ACL values [/acls/{acl_id}/{value}]
+
++ Parameters
+  + acl_id (number) - ID of the ACL in the form of an integer
+  + value (string) - ACL value to lookup
+
+### Show ACL entries [GET]
+
+Returns all the matching patterns associated with this ACL.
+
++ Response 200 (application/json)
+
+        [
+          "type=str, case=insensitive, match=yes, idx=list, pattern="foo.com""
+        ]
+
+
+# Group Stick-tables
+
+Resources related to HAProxy stick-table operations.
+
+## Stick-table collection [/tables]
+
+### List all stick-tables [GET]
+
++ Response 200 (application/json)
+
+        [
+          # table: bk_https, type: ip, size:1048576, used:0"
+        ]
+
+## Stick-table [/tables/{name}]
+
++ Parameters
+  + name (string) - Name of the stick-table to lookup
+
+### Show stick-table detail [GET]
+
++ Response 200 (application/json)
+
+        [
+          "# table: bk_https, type: ip, size:1048576, used:2",
+          "0x5650b31d0350: key=127.0.0.1 use=0 exp=4651 http_req_rate(10000)=1234",
+          "0x5650b31cac50: key=127.0.0.2 use=0 exp=4651 http_req_rate(10000)=5678"
+        ]
+
+### Update stick-table [PATCH]
+
+Update stick-table.
+
++ Request (application/json)
+
+        {
+          "127.0.0.1": "data.http_req_rate 1234",
+          "127.0.0.2": "data.http_req_rate 5678"
+        }
+
++ Response 204
+
+### Clear map [DELETE]
+
+Clear all entries for a map.
+
++ Response 204
+
+## Stick-table entries [/tables/{name}/{key}]
+
++ Parameters
+  + name (string) - Name of the stick-table to lookup
+  + key (string) - stick-table key to lookup
+
+### Show stick-table entries [GET]
+
++ Response 200 (application/json)
+
+        [
+          "# table: bk_https, type: ip, size:1048576, used:2",
+          "0x5650b31d0010: key=127.0.0.1 use=0 exp=5354 http_req_rate(10000)=1234"
+        ]
+
+### Delete stick-table entries [DELETE]
+
+Delete the stick-table entries corresponding to the key.
+
++ Response 204
