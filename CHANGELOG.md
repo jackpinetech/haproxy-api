@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-01-10
+### Added
+- Support for "creating" (configuring and enabling a previously disabled server) a server in a backend
+### Changed
+- Updated version of `haproxy-sdk`
+- Updated third-party dependencies to patch vulnerabilities
+### Fixed
+- `command failure` when PATCH-ing servers
+
 ## [1.0.0] - 2019-05-24
 ### Added
 - Initial release of `haproxy-api`

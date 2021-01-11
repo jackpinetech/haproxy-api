@@ -3,9 +3,10 @@
  * Clear all entries for a stick-table
  */
 exports.clearTable = (req, res) => {
-  res.locals.haproxy.clearTable(req.params.name)
+  res.locals.haproxy
+    .clearTable(req.params.name)
     .then(() => res.status(204).end())
-    .catch(reason => res.status(400).send(reason));
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -13,9 +14,10 @@ exports.clearTable = (req, res) => {
  * Clear all entries for a stick-table corresponding to the key
  */
 exports.deleteTableEntry = (req, res) => {
-  res.locals.haproxy.delTable(req.params.name, req.params.key)
+  res.locals.haproxy
+    .delTable(req.params.name, req.params.key)
     .then(() => res.status(204).end())
-    .catch(reason => res.status(400).send(reason));
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -23,9 +25,10 @@ exports.deleteTableEntry = (req, res) => {
  * List all stick-tables
  */
 exports.get = (req, res) => {
-  res.locals.haproxy.showTable()
-    .then(tables => res.json(tables))
-    .catch(reason => res.status(400).send(reason));
+  res.locals.haproxy
+    .showTable()
+    .then((tables) => res.json(tables))
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -33,9 +36,10 @@ exports.get = (req, res) => {
  * Show stick-table
  */
 exports.getTable = (req, res) => {
-  res.locals.haproxy.showTable(req.params.name)
-    .then(table => res.json(table))
-    .catch(reason => res.status(400).send(reason));
+  res.locals.haproxy
+    .showTable(req.params.name)
+    .then((table) => res.json(table))
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -43,9 +47,10 @@ exports.getTable = (req, res) => {
  * Show stick-table entry
  */
 exports.getTableEntry = (req, res) => {
-  res.locals.haproxy.getTable(req.params.name, req.params.key)
-    .then(table => res.json(table))
-    .catch(reason => res.status(400).send(reason));
+  res.locals.haproxy
+    .getTable(req.params.name, req.params.key)
+    .then((table) => res.json(table))
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -54,10 +59,14 @@ exports.getTableEntry = (req, res) => {
  */
 exports.patchTable = (req, res) => {
   if (!req.body) {
-    res.status(400).send('no entries to add');
+    res.status(400).send("no entries to add");
     return;
   }
-  Promise.all(Object.keys(req.body).map(key => res.locals.haproxy.setTable(req.params.name, key, req.body[key])))
+  Promise.all(
+    Object.keys(req.body).map((key) =>
+      res.locals.haproxy.setTable(req.params.name, key, req.body[key])
+    )
+  )
     .then(() => res.status(204).end())
-    .catch(reason => res.status(400).send(reason));
+    .catch((reason) => res.status(400).send(reason));
 };

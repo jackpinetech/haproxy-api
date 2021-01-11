@@ -3,9 +3,10 @@
  * Clear all entries for a acl
  */
 exports.clearAcl = (req, res) => {
-  res.locals.haproxy.clearAcl(req.params.id)
+  res.locals.haproxy
+    .clearAcl(req.params.id)
     .then(() => res.status(204).end())
-    .catch(reason => res.status(400).send(reason));
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -13,9 +14,10 @@ exports.clearAcl = (req, res) => {
  * Delete the acl entries corresponding to the key
  */
 exports.deleteAcl = (req, res) => {
-  res.locals.haproxy.delAcl(req.params.id, req.params.key)
+  res.locals.haproxy
+    .delAcl(req.params.id, req.params.key)
     .then(() => res.status(204).end())
-    .catch(reason => res.status(400).send(reason));
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -23,9 +25,10 @@ exports.deleteAcl = (req, res) => {
  * List all acls
  */
 exports.get = (req, res) => {
-  res.locals.haproxy.showAcl()
-    .then(acls => res.json(acls))
-    .catch(reason => res.status(400).send(reason));
+  res.locals.haproxy
+    .showAcl()
+    .then((acls) => res.json(acls))
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -33,9 +36,10 @@ exports.get = (req, res) => {
  * Show acl
  */
 exports.getAcl = (req, res) => {
-  res.locals.haproxy.showAcl(req.params.id)
-    .then(acl => res.json(acl))
-    .catch(reason => res.status(400).send(reason));
+  res.locals.haproxy
+    .showAcl(req.params.id)
+    .then((acl) => res.json(acl))
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -43,9 +47,10 @@ exports.getAcl = (req, res) => {
  * Show acl entry
  */
 exports.getAclValue = (req, res) => {
-  res.locals.haproxy.getAcl(req.params.id, req.params.value)
-    .then(acl => res.json(acl))
-    .catch(reason => res.status(400).send(reason));
+  res.locals.haproxy
+    .getAcl(req.params.id, req.params.value)
+    .then((acl) => res.json(acl))
+    .catch((reason) => res.status(400).send(reason));
 };
 
 /**
@@ -53,11 +58,12 @@ exports.getAclValue = (req, res) => {
  * Update acl
  */
 exports.patchAcl = (req, res) => {
-  if (!req.body['pattern']) {
-    res.status(400).send('invalid pattern');
+  if (!req.body["pattern"]) {
+    res.status(400).send("invalid pattern");
     return;
   }
-  res.locals.haproxy.addAcl(req.params.id, req.body['pattern'])
+  res.locals.haproxy
+    .addAcl(req.params.id, req.body["pattern"])
     .then(() => res.status(204).end())
-    .catch(reason => res.status(400).send(reason));
+    .catch((reason) => res.status(400).send(reason));
 };
