@@ -43,9 +43,6 @@
   "license": "(MIT OR Apache-2.0)",
   "main": "app.js",
   "name": "haproxy-api",
-  "publishConfig": {
-    "registry": "https://nexus.jackpinetech.com/repository/npm-internal/"
-  },
   "repository": {
     "type": "git",
     "url": "https://git.jackpinetech.com/jackpine/haproxy-api.git"
